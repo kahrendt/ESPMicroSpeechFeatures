@@ -1,0 +1,26 @@
+{
+    "name": "ESPMicroSpeechFeatures",
+    "version": "1.0.0",
+    "description": "Generates TensorFlow micro spectrogram features from audio samples",
+    "keywords": "tensorflow, spectrogram, audio",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/kahrendt/ESPMicroSpeechFeatures.git"
+    },
+    "authors":
+    [
+      {
+        "name": "TensorFlow Authors"
+      },
+      {
+        "name": "Kevin Ahrendt",
+        "maintainer": true
+      }
+    ],
+    "license": "Apache-2.0",
+    "homepage": "https://github.com/kahrendt/ESPMicroSpeechFeatures.git",
+    "dependencies": {},
+    "frameworks": "*",
+    "platforms": "espressif32"
+  }
