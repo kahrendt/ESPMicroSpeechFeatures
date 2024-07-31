@@ -1,4 +1,5 @@
 /* Copyright 2018 The TensorFlow Authors. All Rights Reserved.
+Modifications copyright 2024 Kevin Ahrendt.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,37 +18,51 @@ limitations under the License.
 #include <math.h>
 #include <stdio.h>
 
+#ifdef USE_ESP32
+#include <esp_heap_caps.h>
+#endif
+
 #define kint16max 0x00007FFF
 
-void PcanGainControlFillConfigWithDefaults(struct PcanGainControlConfig *config) {
+void PcanGainControlFillConfigWithDefaults(struct PcanGainControlConfig *config)
+{
   config->enable_pcan = 0;
   config->strength = 0.95;
   config->offset = 80.0;
   config->gain_bits = 21;
 }
 
-int16_t PcanGainLookupFunction(const struct PcanGainControlConfig *config, int32_t input_bits, uint32_t x) {
-  const float x_as_float = ((float) x) / ((uint32_t) 1 << input_bits);
+int16_t PcanGainLookupFunction(const struct PcanGainControlConfig *config, int32_t input_bits, uint32_t x)
+{
+  const float x_as_float = ((float)x) / ((uint32_t)1 << input_bits);
   const float gain_as_float =
-      ((uint32_t) 1 << config->gain_bits) * powf(x_as_float + config->offset, -config->strength);
+      ((uint32_t)1 << config->gain_bits) * powf(x_as_float + config->offset, -config->strength);
 
-  if (gain_as_float > kint16max) {
+  if (gain_as_float > kint16max)
+  {
     return kint16max;
   }
-  return (int16_t) (gain_as_float + 0.5f);
+  return (int16_t)(gain_as_float + 0.5f);
 }
 
 int PcanGainControlPopulateState(const struct PcanGainControlConfig *config, struct PcanGainControlState *state,
                                  uint32_t *noise_estimate, const int num_channels, const uint16_t smoothing_bits,
-                                 const int32_t input_correction_bits) {
+                                 const int32_t input_correction_bits)
+{
   state->enable_pcan = config->enable_pcan;
-  if (!state->enable_pcan) {
+  if (!state->enable_pcan)
+  {
     return 1;
   }
   state->noise_estimate = noise_estimate;
   state->num_channels = num_channels;
-  state->gain_lut = (int16_t *) malloc(kWideDynamicFunctionLUTSize * sizeof(int16_t));
-  if (state->gain_lut == NULL) {
+#ifdef USE_ESP32
+  state->gain_lut = (int16_t *)heap_caps_malloc(kWideDynamicFunctionLUTSize * sizeof(int16_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+#else
+  state->gain_lut = (int16_t *)malloc(kWideDynamicFunctionLUTSize * sizeof(int16_t));
+#endif
+  if (state->gain_lut == NULL)
+  {
     fprintf(stderr, "Failed to allocate gain LUT\n");
     return 0;
   }
@@ -58,8 +73,9 @@ int PcanGainControlPopulateState(const struct PcanGainControlConfig *config, str
   state->gain_lut[1] = PcanGainLookupFunction(config, input_bits, 1);
   state->gain_lut -= 6;
   int interval;
-  for (interval = 2; interval <= kWideDynamicFunctionBits; ++interval) {
-    const uint32_t x0 = (uint32_t) 1 << (interval - 1);
+  for (interval = 2; interval <= kWideDynamicFunctionBits; ++interval)
+  {
+    const uint32_t x0 = (uint32_t)1 << (interval - 1);
     const uint32_t x1 = x0 + (x0 >> 1);
     const uint32_t x2 = (interval == kWideDynamicFunctionBits) ? x0 + (x0 - 1) : 2 * x0;
 
@@ -67,14 +83,14 @@ int PcanGainControlPopulateState(const struct PcanGainControlConfig *config, str
     const int16_t y1 = PcanGainLookupFunction(config, input_bits, x1);
     const int16_t y2 = PcanGainLookupFunction(config, input_bits, x2);
 
-    const int32_t diff1 = (int32_t) y1 - y0;
-    const int32_t diff2 = (int32_t) y2 - y0;
+    const int32_t diff1 = (int32_t)y1 - y0;
+    const int32_t diff2 = (int32_t)y2 - y0;
     const int32_t a1 = 4 * diff1 - diff2;
     const int32_t a2 = diff2 - a1;
 
     state->gain_lut[4 * interval] = y0;
-    state->gain_lut[4 * interval + 1] = (int16_t) a1;
-    state->gain_lut[4 * interval + 2] = (int16_t) a2;
+    state->gain_lut[4 * interval + 1] = (int16_t)a1;
+    state->gain_lut[4 * interval + 2] = (int16_t)a2;
   }
   state->gain_lut += 6;
   return 1;
