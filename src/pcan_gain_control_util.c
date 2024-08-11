@@ -57,10 +57,12 @@ int PcanGainControlPopulateState(const struct PcanGainControlConfig *config, str
   state->noise_estimate = noise_estimate;
   state->num_channels = num_channels;
 #ifdef USE_ESP32
-  state->gain_lut = (int16_t *)heap_caps_malloc(kWideDynamicFunctionLUTSize * sizeof(int16_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-  state->gain_lut = (int16_t *)malloc(kWideDynamicFunctionLUTSize * sizeof(int16_t));
+  state->gain_lut = heap_caps_malloc(kWideDynamicFunctionLUTSize * sizeof(int16_t), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (state->gain_lut == NULL)
 #endif
+  {
+    state->gain_lut = malloc(kWideDynamicFunctionLUTSize * sizeof(int16_t));
+  }
   if (state->gain_lut == NULL)
   {
     fprintf(stderr, "Failed to allocate gain LUT\n");

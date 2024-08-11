@@ -70,24 +70,64 @@ int FilterbankPopulateState(const struct FilterbankConfig *config, struct Filter
       (kFilterbankIndexAlignment < sizeof(int16_t) ? 1 : kFilterbankIndexAlignment / sizeof(int16_t));
 
 #ifdef USE_ESP32
-  state->channel_frequency_starts = (int16_t *)heap_caps_malloc(num_channels_plus_1 * sizeof(*state->channel_frequency_starts), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-  state->channel_weight_starts = (int16_t *)heap_caps_malloc(num_channels_plus_1 * sizeof(*state->channel_weight_starts), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-  state->channel_widths = (int16_t *)heap_caps_malloc(num_channels_plus_1 * sizeof(*state->channel_widths), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-  state->work = (uint64_t *)heap_caps_malloc(num_channels_plus_1 * sizeof(*state->work), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-
-  float *center_mel_freqs = (float *)heap_caps_malloc(num_channels_plus_1 * sizeof(*center_mel_freqs), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-  int16_t *actual_channel_starts = (int16_t *)heap_caps_malloc(num_channels_plus_1 * sizeof(*actual_channel_starts), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-  int16_t *actual_channel_widths = (int16_t *)heap_caps_malloc(num_channels_plus_1 * sizeof(*actual_channel_widths), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-  state->channel_frequency_starts = (int16_t *)malloc(num_channels_plus_1 * sizeof(*state->channel_frequency_starts));
-  state->channel_weight_starts = (int16_t *)malloc(num_channels_plus_1 * sizeof(*state->channel_weight_starts));
-  state->channel_widths = (int16_t *)malloc(num_channels_plus_1 * sizeof(*state->channel_widths));
-  state->work = (uint64_t *)malloc(num_channels_plus_1 * sizeof(*state->work));
-
-  float *center_mel_freqs = (float *)malloc(num_channels_plus_1 * sizeof(*center_mel_freqs));
-  int16_t *actual_channel_starts = (int16_t *)malloc(num_channels_plus_1 * sizeof(*actual_channel_starts));
-  int16_t *actual_channel_widths = (int16_t *)malloc(num_channels_plus_1 * sizeof(*actual_channel_widths));
+  state->channel_frequency_starts = heap_caps_malloc(num_channels_plus_1 * sizeof(*state->channel_frequency_starts), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (state->channel_frequency_starts == NULL)
 #endif
+  {
+    state->channel_frequency_starts = malloc(num_channels_plus_1 * sizeof(*state->channel_frequency_starts));
+  }
+
+#ifdef USE_ESP32
+  state->channel_weight_starts = heap_caps_malloc(num_channels_plus_1 * sizeof(*state->channel_weight_starts), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (state->channel_weight_starts == NULL)
+#endif
+  {
+    state->channel_weight_starts = malloc(num_channels_plus_1 * sizeof(*state->channel_weight_starts));
+  }
+
+#ifdef USE_ESP32
+  state->channel_widths = heap_caps_malloc(num_channels_plus_1 * sizeof(*state->channel_widths), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (state->channel_widths == NULL)
+#endif
+  {
+    state->channel_widths = malloc(num_channels_plus_1 * sizeof(*state->channel_widths));
+  }
+
+#ifdef USE_ESP32
+  state->work = heap_caps_malloc(num_channels_plus_1 * sizeof(*state->work), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (state->work == NULL)
+#endif
+  {
+    state->work = malloc(num_channels_plus_1 * sizeof(*state->work));
+  }
+
+  float *center_mel_freqs = NULL;
+#ifdef USE_ESP32
+  center_mel_freqs = heap_caps_malloc(num_channels_plus_1 * sizeof(*center_mel_freqs), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (center_mel_freqs == NULL)
+#endif
+  {
+    center_mel_freqs = malloc(num_channels_plus_1 * sizeof(*center_mel_freqs));
+  }
+
+  int16_t *actual_channel_starts = NULL;
+#ifdef USE_ESP32
+  actual_channel_starts = heap_caps_malloc(num_channels_plus_1 * sizeof(*actual_channel_starts), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (actual_channel_starts == NULL)
+#endif
+  {
+    actual_channel_starts = malloc(num_channels_plus_1 * sizeof(*actual_channel_starts));
+  }
+
+  int16_t *actual_channel_widths = NULL;
+#ifdef USE_ESP32
+  actual_channel_widths = heap_caps_malloc(num_channels_plus_1 * sizeof(*actual_channel_widths), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (actual_channel_widths == NULL)
+#endif
+  {
+    actual_channel_widths = malloc(num_channels_plus_1 * sizeof(*actual_channel_widths));
+  }
+
   if (state->channel_frequency_starts == NULL || state->channel_weight_starts == NULL ||
       state->channel_widths == NULL || center_mel_freqs == NULL || actual_channel_starts == NULL ||
       actual_channel_widths == NULL)

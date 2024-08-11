@@ -41,10 +41,12 @@ int WindowPopulateState(const struct WindowConfig *config, struct WindowState *s
   state->step = config->step_size_ms * sample_rate / 1000;
 
 #ifdef USE_ESP32
-  state->coefficients = (int16_t *)heap_caps_malloc(state->size * sizeof(*state->coefficients), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-  state->coefficients = (int16_t *)malloc(state->size * sizeof(*state->coefficients));
+  state->coefficients = heap_caps_malloc(state->size * sizeof(*state->coefficients), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (state->coefficients == NULL)
 #endif
+  {
+    state->coefficients = malloc(state->size * sizeof(*state->coefficients));
+  }
   if (state->coefficients == NULL)
   {
     fprintf(stderr, "Failed to allocate window coefficients\n");
@@ -63,10 +65,12 @@ int WindowPopulateState(const struct WindowConfig *config, struct WindowState *s
 
   state->input_used = 0;
 #ifdef USE_ESP32
-  state->input = (int16_t *)heap_caps_malloc(state->size * sizeof(*state->input), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-  state->input = (int16_t *)malloc(state->size * sizeof(*state->input));
+  state->input = heap_caps_malloc(state->size * sizeof(*state->input), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (state->input == NULL)
 #endif
+  {
+    state->input = malloc(state->size * sizeof(*state->input));
+  }
   if (state->input == NULL)
   {
     fprintf(stderr, "Failed to allocate window input\n");
@@ -74,10 +78,12 @@ int WindowPopulateState(const struct WindowConfig *config, struct WindowState *s
   }
 
 #ifdef USE_ESP32
-  state->output = (int16_t *)heap_caps_malloc(state->size * sizeof(*state->output), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-  state->output = (int16_t *)malloc(state->size * sizeof(*state->output));
+  state->output = heap_caps_malloc(state->size * sizeof(*state->output), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (state->output == NULL)
 #endif
+  {
+    state->output = malloc(state->size * sizeof(*state->output));
+  }
   if (state->output == NULL)
   {
     fprintf(stderr, "Failed to allocate window output\n");

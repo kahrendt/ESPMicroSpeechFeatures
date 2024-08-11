@@ -34,10 +34,12 @@ int FftPopulateState(struct FftState *state, size_t input_size)
 
 #ifdef USE_ESP32
   state->input =
-      (int16_t *)(heap_caps_malloc(state->fft_size * sizeof(*state->input), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
-#else
-  state->input = (int16_t *)(malloc(state->fft_size * sizeof(*state->input)));
+      heap_caps_malloc(state->fft_size * sizeof(*state->input), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
+  if (state->input == NULL)
 #endif
+  {
+    state->input = malloc(state->fft_size * sizeof(*state->input));
+  }
   if (state->input == NULL)
   {
     fprintf(stderr, "Failed to alloc fft input buffer\n");
@@ -47,9 +49,11 @@ int FftPopulateState(struct FftState *state, size_t input_size)
 #ifdef USE_ESP32
   state->output = heap_caps_malloc((state->fft_size / 2 + 1) * sizeof(*state->output) * 2,
                                    MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-  state->output = malloc((state->fft_size / 2 + 1) * sizeof(*state->output) * 2);
+  if (state->output == NULL)
 #endif
+  {
+    state->output = malloc((state->fft_size / 2 + 1) * sizeof(*state->output) * 2);
+  }
   if (state->output == NULL)
   {
     fprintf(stderr, "Failed to alloc fft output buffer\n");
@@ -67,9 +71,12 @@ int FftPopulateState(struct FftState *state, size_t input_size)
 
 #ifdef USE_ESP32
   state->scratch = heap_caps_malloc(scratch_size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
-#else
-  state->scratch = malloc(scratch_size);
+  if (state->scratch == NULL)
 #endif
+  {
+    state->scratch = malloc(scratch_size);
+  }
+
   if (state->scratch == NULL)
   {
     fprintf(stderr, "Failed to alloc fft scratch buffer\n");
