@@ -33,7 +33,8 @@ int FftPopulateState(struct FftState *state, size_t input_size)
   }
 
 #ifdef USE_ESP32
-  state->input = (int16_t *)(heap_caps_malloc(state->fft_size * sizeof(*state->input), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
+  state->input =
+      (int16_t *)(heap_caps_malloc(state->fft_size * sizeof(*state->input), MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
 #else
   state->input = (int16_t *)(malloc(state->fft_size * sizeof(*state->input)));
 #endif
@@ -43,11 +44,11 @@ int FftPopulateState(struct FftState *state, size_t input_size)
     return 0;
   }
 
-  // Cast to int32_t instead of the original complex_int16_t, easy way to fix issues converting the original file into C (may not be the best/proper way!)
 #ifdef USE_ESP32
-  state->output = (int32_t *)(heap_caps_malloc((state->fft_size / 2 + 1) * sizeof(*state->output) * 2, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT));
+  state->output = heap_caps_malloc((state->fft_size / 2 + 1) * sizeof(*state->output) * 2,
+                                   MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 #else
-  state->output = (int32_t *)(malloc((state->fft_size / 2 + 1) * sizeof(*state->output) * 2));
+  state->output = malloc((state->fft_size / 2 + 1) * sizeof(*state->output) * 2);
 #endif
   if (state->output == NULL)
   {
