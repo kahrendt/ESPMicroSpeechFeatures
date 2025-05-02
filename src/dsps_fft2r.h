@@ -32,6 +32,8 @@ extern "C"
     extern int dsps_fft_w_table_sc16_size;
     extern uint8_t dsps_fft2r_sc16_initialized;
 
+    bool dsp_is_power_of_two(int x);
+
     /**@{*/
     /**
      * @brief      init fft tables

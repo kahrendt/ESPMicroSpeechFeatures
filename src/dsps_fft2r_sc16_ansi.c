@@ -43,6 +43,10 @@ unsigned short reverse(unsigned short x, unsigned short N, int order)
     return b >> (16 - order);
 }
 
+bool dsp_is_power_of_two(int x)
+{
+    return (x != 0) && ((x & (x - 1)) == 0);
+}
 
 static const int add_rount_mult = 0x7fff;
 static const int mult_shift_const = 0x7fff; // Used to shift data << 15
