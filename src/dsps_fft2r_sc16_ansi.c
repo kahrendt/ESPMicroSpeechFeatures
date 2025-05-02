@@ -90,14 +90,14 @@ esp_err_t dsps_fft2r_init_sc16(int16_t *fft_table_buff, int table_size)
         return result;
     }
     if (table_size > CONFIG_DSP_MAX_FFT_SIZE) {
-        return ESP_ERR_DSP_PARAM_OUTOFRANGE;
+        return ESP_FAIL;
     }
     if (table_size == 0) {
         return result;
     }
     if (fft_table_buff != NULL) {
         if (dsps_fft2r_sc16_mem_allocated) {
-            return ESP_ERR_DSP_REINITIALIZED;
+            return ESP_FAIL;
         }
         dsps_fft_w_table_sc16 = fft_table_buff;
         dsps_fft_w_table_sc16_size = table_size;
@@ -133,10 +133,10 @@ void dsps_fft2r_deinit_sc16()
 esp_err_t dsps_fft2r_sc16_ansi_(int16_t *data, int N, int16_t *sc_table)
 {
     if (!dsp_is_power_of_two(N)) {
-        return ESP_ERR_DSP_INVALID_LENGTH;
+        return ESP_FAIL;
     }
     if (!dsps_fft2r_sc16_initialized) {
-        return ESP_ERR_DSP_UNINITIALIZED;
+        return ESP_FAIL;
     }
 
     esp_err_t result = ESP_OK;
@@ -197,7 +197,7 @@ static inline unsigned short reverse_sc16(unsigned short x, unsigned short N, in
 esp_err_t dsps_bit_rev_sc16_ansi(int16_t *data, int N)
 {
     if (!dsp_is_power_of_two(N)) {
-        return ESP_ERR_DSP_INVALID_LENGTH;
+        return ESP_FAIL;
     }
     esp_err_t result = ESP_OK;
 
@@ -224,7 +224,7 @@ esp_err_t dsps_bit_rev_sc16_ansi(int16_t *data, int N)
 esp_err_t dsps_gen_w_r2_sc16(int16_t *w, int N)
 {
     if (!dsp_is_power_of_two(N)) {
-        return ESP_ERR_DSP_INVALID_LENGTH;
+        return ESP_FAIL;
     }
 
     esp_err_t result = ESP_OK;
@@ -243,7 +243,7 @@ esp_err_t dsps_gen_w_r2_sc16(int16_t *w, int N)
 esp_err_t dsps_cplx2reC_sc16(int16_t *data, int N)
 {
     if (!dsp_is_power_of_two(N)) {
-        return ESP_ERR_DSP_INVALID_LENGTH;
+        return ESP_FAIL;
     }
     esp_err_t result = ESP_OK;
 
