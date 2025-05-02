@@ -28,6 +28,9 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  fixed or floating point complex numbers.  It also delares the kf_ internal functions.
  */
 
+ #include "dsps_fft2r_sc16.h"
+int16_t *esp_table_buffer = NULL;
+
 static void kf_bfly2(kiss_fft_cpx *Fout, const size_t fstride, const kiss_fft_cfg st, int m) {
   kiss_fft_cpx *Fout2;
   kiss_fft_cpx *tw1 = st->twiddles;
@@ -345,6 +348,11 @@ static void kf_factor(int n, int *facbuf) {
  * It can be freed with free(), rather than a kiss_fft-specific function.
  * */
 kiss_fft_cfg kiss_fft_alloc(int nfft, int inverse_fft, void *mem, size_t *lenmem) {
+  if (esp_table_buffer == NULL) {
+    esp_table_buffer = (int16_t*)malloc(nfft*sizeof(int16_t));
+    dsps_fft2r_init_sc16(esp_table_buffer, nfft);
+  }
+
   kiss_fft_cfg st = NULL;
   size_t memneeded = sizeof(struct kiss_fft_state) + sizeof(kiss_fft_cpx) * (nfft - 1); /* twiddle factors*/
 
@@ -386,7 +394,12 @@ void kiss_fft_stride(kiss_fft_cfg st, const kiss_fft_cpx *fin, kiss_fft_cpx *fou
   }
 }
 
-void kiss_fft(kiss_fft_cfg cfg, const kiss_fft_cpx *fin, kiss_fft_cpx *fout) { kiss_fft_stride(cfg, fin, fout, 1); }
+void kiss_fft(kiss_fft_cfg cfg, const kiss_fft_cpx *fin, kiss_fft_cpx *fout) { 
+  memcpy(fout, fin, sizeof(kiss_fft_cpx) * cfg->nfft);
+  dsps_fft2r_sc16_ansi_((int16_t *)fout, cfg->nfft, esp_table_buffer);
+  dsps_bit_rev_sc16_ansi((int16_t*)fout, cfg->nfft);
+  // kiss_fft_stride(cfg, fin, fout, 1); 
+}
 
 void kiss_fft_cleanup(void) {
   // nothing needed any more
