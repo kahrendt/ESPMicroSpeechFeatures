@@ -182,11 +182,11 @@ extern "C"
 #endif
 
 #if (dsps_fft2r_sc16_aes3_enabled == 1)
-#define dsps_fft2r_sc16 dsps_fft2r_sc16_aes3
+#define dsps_fft2r_sc16 dsps_fft2r_sc16_aes3_
 #elif (dsps_fft2r_sc16_ae32_enabled == 1)
-#define dsps_fft2r_sc16 dsps_fft2r_sc16_ae32
+#define dsps_fft2r_sc16 dsps_fft2r_sc16_ae32_
 #else
-#define dsps_fft2r_sc16 dsps_fft2r_sc16_ansi
+#define dsps_fft2r_sc16 dsps_fft2r_sc16_ansi_
 #endif
 
 #endif // _dsps_fft2r_H_
