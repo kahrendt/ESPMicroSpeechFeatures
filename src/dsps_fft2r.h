@@ -19,6 +19,8 @@
 
 #include <esp_err.h>
 
+#include <stdbool.h>
+
 #ifndef CONFIG_DSP_MAX_FFT_SIZE
 #define CONFIG_DSP_MAX_FFT_SIZE 4096
 #endif // CONFIG_DSP_MAX_FFT_SIZE
