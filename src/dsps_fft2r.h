@@ -52,7 +52,7 @@ extern "C"
      *      - ESP_ERR_DSP_REINITIALIZED if buffer already allocated internally by other function
      *      - One of the error codes from DSP library
      */
-    void dsps_fft2r_init_sc16(int16_t *fft_table_buff, int table_size);
+    esp_err_t dsps_fft2r_init_sc16(int16_t *fft_table_buff, int table_size);
     /**@}*/
 
     /**@{*/
