@@ -25,7 +25,7 @@
     "platforms": "espressif32",
     "build": {
       "flags": [
-        "-O3"
+        "-O2"
       ]
     }
   }
